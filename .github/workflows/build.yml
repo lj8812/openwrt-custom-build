@@ -30,23 +30,12 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
-    - name: Apply Custom Configuration
+    - name: Apply Custom Config
       run: |
-        # 复制主配置文件
-        echo "Copying .config..."
-        cp -fv config/.config openwrt/.config || { echo ".config 文件不存在！"; exit 1; }
-        
-        # 复制网络配置
-        echo "Copying network config..."
-        mkdir -p openwrt/files/etc/config
-        cp -fv config/files/etc/config/network openwrt/files/etc/config/network || { echo "network 文件不存在！"; exit 1; }
-        
-        # 应用配置
+        cp -rf config/.config openwrt/
+        cp -rf config/files openwrt/files
         cd openwrt
         make defconfig
-        ./scripts/diffconfig.sh | tee diffconfig.log
-        echo "当前差异配置："
-        cat diffconfig.log
 
     - name: Build Firmware
       run: |
@@ -64,29 +53,3 @@ jobs:
         path: |
           openwrt/bin/targets/x86/64/*squashfs-combined*.img.gz
           openwrt/build.log
-
-    - name: Create GitHub Release
-      if: success()
-      uses: softprops/action-gh-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        files: |
-          openwrt/bin/targets/x86/64/*squashfs-combined*.img.gz
-        tag_name: v23.05.5-squashfs
-        name: "OpenWrt 23.05.5 (SquashFS Only)"
-        body: |
-          ### 定制固件特性
-          - ​**架构**: x86_64
-          - ​**文件系统**: SquashFS (只读)
-          - ​**启动支持**: 
-            - UEFI (`*-efi.img.gz`)
-            - Legacy BIOS (`*-legacy.img.gz`)
-          - ​**默认 IP**: 192.168.0.20
-          - ​**包含组件**:
-            - 中文 LuCI 界面
-            - OpenSSH SFTP 服务器
-            - nftables 过滤模块
-          - ​**编译时间**: ${{ github.run_started_at }}
-        draft: false
-        prerelease: false
