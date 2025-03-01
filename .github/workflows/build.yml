@@ -3,7 +3,7 @@ name: Build OpenWrt x86_64 Custom Firmware
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch:    # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,8 +11,9 @@ jobs:
     timeout-minutes: 120
 
     steps:
+    # 步骤 1-4 保持不变
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4  # 必须升级到 v4
 
     - name: Setup Environment
       run: |
@@ -35,32 +36,31 @@ jobs:
         cd openwrt
         make defconfig
 
+    # ▼▼▼ 关键修改点 ▼▼▼
     - name: Build Firmware
       run: |
         cd openwrt
         make -j$(nproc) V=s 2>&1 | tee build.log
 
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # 必须升级到 v4
       with:
         name: openwrt-custom
         path: |
           openwrt/bin/targets/x86/64/*.img.gz
           openwrt/build.log
-# ▼▼▼ 添加以下内容 ▼▼▼
+
     - name: Create Release
-      if: success()  # 仅在编译成功时执行
+      if: success()
       uses: softprops/action-gh-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动使用 GitHub 令牌
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
-          openwrt/bin/targets/x86/64/*.img.gz      # 上传固件文件
-        tag_name: v23.05.5-custom                  # Release 标签名称
-        name: "OpenWrt 23.05.5 定制版"             # Release 标题（可选）
-        body: |                                    # Release 描述
+          openwrt/bin/targets/x86/64/*.img.gz
+        tag_name: v23.05.5-custom
+        body: |
           OpenWrt 23.05.5 定制固件
           - 编译时间: ${{ github.run_started_at }}
           - 功能特性: 中文界面/SFTP/NFT过滤/IP:192.168.0.20
-        draft: false     # 是否存为草稿（true=是）
-        prerelease: false # 是否标记为预发布（true=是）
+        draft: false
