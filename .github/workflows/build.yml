@@ -32,8 +32,11 @@ jobs:
 
     - name: Apply Custom Config
       run: |
-        cp -rf config/.config openwrt/
-        cp -rf config/files openwrt/files
+        # 从仓库根目录复制配置到 openwrt 子目录
+        cp -fv ./config/.config ./openwrt/.config
+        cp -rfv ./config/files ./openwrt/
+        
+        # 应用配置
         cd openwrt
         make defconfig
 
