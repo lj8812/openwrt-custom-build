@@ -1,6 +1,9 @@
 # 修改默认 LAN IP
 config interface 'lan'
-    option proto 'static'
-    option ipaddr '192.168.0.20'
-    option netmask '255.255.255.0'
-    option device 'br-lan'
+	option type 'bridge'
+	option ifname 'eth0'
+	option proto 'static'
+	option netmask '255.255.255.0'
+	option gateway '192.168.0.1'
+	option dns '192.168.0.1'
+	option ipaddr '192.168.0.20'
