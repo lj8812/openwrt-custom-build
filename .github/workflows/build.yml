@@ -32,16 +32,21 @@ jobs:
 
     - name: Apply Custom Configuration
       run: |
-        # 复制配置文件到正确位置
-        cp -rf config/.config openwrt/
+        # 复制主配置文件
+        echo "Copying .config..."
+        cp -fv config/.config openwrt/.config || { echo ".config 文件不存在！"; exit 1; }
+        
+        # 复制网络配置
+        echo "Copying network config..."
         mkdir -p openwrt/files/etc/config
-        cp -f config/files/etc/config/network openwrt/files/etc/config/
+        cp -fv config/files/etc/config/network openwrt/files/etc/config/network || { echo "network 文件不存在！"; exit 1; }
         
         # 应用配置
         cd openwrt
         make defconfig
-        ./scripts/diffconfig.sh > diffconfig
-        cat diffconfig
+        ./scripts/diffconfig.sh | tee diffconfig.log
+        echo "当前差异配置："
+        cat diffconfig.log
 
     - name: Build Firmware
       run: |
