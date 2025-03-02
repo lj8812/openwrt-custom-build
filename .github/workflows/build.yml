@@ -29,13 +29,12 @@ jobs:
         
     - name: Modify Default IP
       run: |
-        # 修改默认 IP 地址
+        cd openwrt  # 必须再次进入目录
         sed -i 's/192\.168\.1\.1/192.168.0.20/g' package/base-files/files/bin/config_generate
         
     - name: Apply Custom Config
       run: |
         cp -rf config/.config openwrt/
-        cp -rf config/files openwrt/files
         cd openwrt
         make defconfig
         
