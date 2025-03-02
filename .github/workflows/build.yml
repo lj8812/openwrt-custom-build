@@ -1,9 +1,7 @@
-name: Build OpenWrt x86_64 Custom Firmware
+name: Build OpenWrt x86_64 Custom Firmware (Manual Only)
 
 on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
+  workflow_dispatch:  # 仅允许手动触发
 
 jobs:
   build:
