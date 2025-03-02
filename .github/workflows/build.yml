@@ -20,17 +20,17 @@ jobs:
           git gettext libncurses5-dev libssl-dev python3-distutils rsync unzip zlib1g-dev \
           file wget curl
           
-    - name: Modify Default IP
-      run: |
-        # 修改默认 IP 地址
-        sed -i 's/192\.168\.1\.1/192.168.0.20/g' package/base-files/files/bin/config_generate
-        
     - name: Clone OpenWrt Source
       run: |
         git clone --depth 1 --branch v23.05.5 https://github.com/openwrt/openwrt.git
         cd openwrt
         ./scripts/feeds update -a
         ./scripts/feeds install -a
+        
+    - name: Modify Default IP
+      run: |
+        # 修改默认 IP 地址
+        sed -i 's/192\.168\.1\.1/192.168.0.20/g' package/base-files/files/bin/config_generate
         
     - name: Apply Custom Config
       run: |
